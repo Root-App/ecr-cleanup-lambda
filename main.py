@@ -15,12 +15,7 @@ from __future__ import print_function
 import argparse
 import os
 import re
-
 import boto3
-try:
-    import requests
-except ImportError:
-    from botocore.vendored import requests
 
 REGION = None
 DRYRUN = None
@@ -43,15 +38,13 @@ def initialize():
     IMAGES_TO_KEEP = int(os.environ.get('IMAGES_TO_KEEP', 100))
     IGNORE_TAGS_REGEX = os.environ.get('IGNORE_TAGS_REGEX', "^$")
 
-def handler(event, context):
+def handler():
     initialize()
     if REGION == "None":
-        partitions = requests.get("https://raw.githubusercontent.com/boto/botocore/develop/botocore/data/endpoints.json").json()[
-                'partitions']
-        for partition in partitions:
-            if partition['partition'] == "aws":
-                for endpoint in partition['services']['ecs']['endpoints']:
-                    discover_delete_images(endpoint)
+        ec2_client = boto3.client('ec2')
+        available_regions = ec2_client.describe_regions()['Regions']
+        for region in available_regions:
+            discover_delete_images(region['RegionName'])
     else:
         discover_delete_images(REGION)
 
