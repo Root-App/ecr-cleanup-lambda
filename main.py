@@ -120,11 +120,11 @@ def discover_delete_images(regionname):
                             running_sha.append(image['imageDigest'])
 
         print("Number of running images found {}".format(len(running_sha)))
-
+        ignore_tags_regex = re.compile(IGNORE_TAGS_REGEX)
         for image in tagged_images:
             if tagged_images.index(image) >= IMAGES_TO_KEEP:
                 for tag in image['imageTags']:
-                    if "latest" not in tag and re.compile(IGNORE_TAGS_REGEX).search(tag) is None:
+                    if "latest" not in tag and ignore_tags_regex.search(tag) is None:
                         if not running_sha or image['imageDigest'] not in running_sha:
                             append_to_list(deletesha, image['imageDigest'])
                             append_to_tag_list(deletetag, {"imageUrl": repository['repositoryUri'] + ":" + tag,
@@ -142,20 +142,20 @@ def discover_delete_images(regionname):
             print("Nothing to delete in repository : " + repository['repositoryName'])
 
 
-def append_to_list(_list, repo_id):
-    if not {'imageDigest': repo_id} in _list:
-        _list.append({'imageDigest': repo_id})
+def append_to_list(image_digest_list, repo_id):
+    if not {'imageDigest': repo_id} in image_digest_list:
+        image_digest_list.append({'imageDigest': repo_id})
 
 
-def append_to_tag_list(_list, tag_id):
-    if not tag_id in _list:
-        _list.append(tag_id)
+def append_to_tag_list(tag_list, tag_id):
+    if not tag_id in tag_list:
+        tag_list.append(tag_id)
 
 
-def chunks(_list, chunk_size):
+def chunks(repo_list, chunk_size):
     """Yield successive n-sized chunks from l."""
-    for i in range(0, len(_list), chunk_size):
-        yield _list[i:i + chunk_size]
+    for i in range(0, len(repo_list), chunk_size):
+        yield repo_list[i:i + chunk_size]
 
 
 def delete_images(ecr_client, deletesha, deletetag, repo_id, name):
