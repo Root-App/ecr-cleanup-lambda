@@ -20,15 +20,15 @@ Install virtualenv:
     
 ## Generate the Lambda package
 
-Make sure you're on master, and run the shell script `package-to-zip.sh`. You can pass an optional output filename to it as an argument.
+Make sure your current branch is clean and up-to-date, and run the shell script `package-to-zip.sh`. You can pass an optional output filename to it as an argument.
 This script will create a .zip file in the directory you run it in.
 
 Alternately, here are the steps to create the .zip file manually:
 
 1. CD to the folder that contains main.py.
 1. Run the following command:
-`pip install -r requirements.txt -t `pwd``
-1. Compress the contents of folder (not the folder).
+`pip install -r requirements.txt -t .`
+1. Compress the contents of folder (not the folder), eg `zip -r <FILE_NAME> .`.
     
 ## Upload the package to Lambda
 
